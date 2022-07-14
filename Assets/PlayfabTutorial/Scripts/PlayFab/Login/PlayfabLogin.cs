@@ -2,6 +2,7 @@
 using PlayFab.ClientModels;
 using PlayfabTutorial.Scripts.PlayFab;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace FMGames.Playfab.Login {
     /// <summary>
@@ -121,13 +122,23 @@ namespace FMGames.Playfab.Login {
 
         #endregion
 
+        #region GuestLogin
+
+        public void GuestLogin() {
+            Login(new GuestLogin());
+        }
+        
+        #endregion
+
         private void OnLoginSuccess(LoginResult result) {
             Debug.Log("Login Success!");
+            Debug.Log(result.PlayFabId);
 
             PlayerPrefs.SetString(PlayFabConstants.SavedUsername, loginUi.username.text);
 
-            Debug.Log(result.PlayFabId);
             loginInProgress.SetActive(false);
+
+            SceneManager.LoadScene(1);
         }
 
         private readonly GetPlayerCombinedInfoRequestParams _loginInfoParams =
