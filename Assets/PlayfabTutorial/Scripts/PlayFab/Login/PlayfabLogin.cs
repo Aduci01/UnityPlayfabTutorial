@@ -26,8 +26,8 @@ namespace FMGames.Playfab.Login {
             }
         }
 
-        private void Login(ILogin loginMethod) {
-            loginMethod.Login(_loginInfoParams, OnLoginSuccess, OnLoginFailure);
+        private void Login(ILogin loginMethod, object loginParams) {
+            loginMethod.Login(_loginInfoParams, OnLoginSuccess, OnLoginFailure, loginParams);
 
             loginInProgress.SetActive(true);
         }
@@ -35,7 +35,7 @@ namespace FMGames.Playfab.Login {
         #region Steam Login
 
         public void LoginWithSteam() {
-            Login(new SteamLogin());
+            Login(new SteamLogin(), null);
         }
 
         #endregion
@@ -43,11 +43,12 @@ namespace FMGames.Playfab.Login {
         #region Email Login
 
         public void LoginWithEmail() {
-            if (ValidateLoginData())
-                Login(new EmailLogin(username: loginUi.username.text, password: loginUi.password.text));
+            if (ValidateLoginData()) {
+                Login(new EmailLogin(), new EmailLogin.EmailLoginParams(loginUi.username.text, loginUi.password.text));
+            }
         }
 
-        bool ValidateLoginData() {
+        private bool ValidateLoginData() {
             //Validating data
             string errorMessage = "";
 
@@ -125,7 +126,7 @@ namespace FMGames.Playfab.Login {
         #region GuestLogin
 
         public void GuestLogin() {
-            Login(new GuestLogin());
+            Login(new GuestLogin(), new GuestLogin.GuestLoginParameters(PlayerPrefs.GetString("GUEST_ID")));
         }
         
         #endregion

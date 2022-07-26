@@ -2,22 +2,33 @@
 using PlayFab;
 using PlayFab.ClientModels;
 using PlayfabTutorial.Scripts.PlayFab;
+using UnityEngine;
 
 namespace FMGames.Playfab.Login {
     public class EmailLogin : ILogin {
-        private string _username;
-        private string _password;
+        public class EmailLoginParams {
+            public string username;
+            public string password;
 
-        public EmailLogin(string username, string password) {
-            _username = username;
-            _password = password;
+            public EmailLoginParams(string username, string password) {
+                this.username = username;
+                this.password = password;
+            }
         }
+        
+        public void Login(GetPlayerCombinedInfoRequestParams loginInfoParams, Action<LoginResult> loginSuccess, Action<PlayFabError> loginFailure, object loginParams) {
+            EmailLoginParams emailLoginParams = loginParams as EmailLoginParams;
+            if (emailLoginParams == null) {
+                loginFailure.Invoke(new PlayFabError());
+                Debug.LogError("Login Parameter is null");
 
-        public void Login(GetPlayerCombinedInfoRequestParams loginInfoParams, Action<LoginResult> loginSuccess, Action<PlayFabError> loginFailure) {
+                return;
+            }
+            
             var request = new LoginWithPlayFabRequest {
                 TitleId = PlayFabConstants.TitleID,
-                Password = _password,
-                Username = _username,
+                Password = emailLoginParams.username,
+                Username = emailLoginParams.password,
                 InfoRequestParameters = loginInfoParams,
             };
 

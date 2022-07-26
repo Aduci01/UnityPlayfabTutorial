@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Text;
 using PlayFab;
 using PlayFab.ClientModels;
@@ -6,24 +7,39 @@ using UnityEngine;
 
 namespace FMGames.Playfab.Login {
     public class GuestLogin : ILogin {
-        public void Login(GetPlayerCombinedInfoRequestParams loginInfoParams, Action<LoginResult> loginSuccess,
-            Action<PlayFabError> loginFailure) {
-            string guestCustomID;
-            string guestID;
+        public class GuestLoginParameters {
+            public string guestId;
 
-            if (!PlayerPrefs.HasKey("GUEST_ID")) {
+            public GuestLoginParameters(string guestId) {
+                this.guestId = guestId;
+            }
+        }
+        
+        public void Login(GetPlayerCombinedInfoRequestParams loginInfoParams, Action<LoginResult> loginSuccess,
+            Action<PlayFabError> loginFailure, object loginParams) {
+            string guestCustomID;
+            
+            GuestLoginParameters guestLoginParams = loginParams as GuestLoginParameters;
+            if (guestLoginParams == null) {
+                loginFailure.Invoke(new PlayFabError());
+                Debug.LogError("Login Parameter is null");
+
+                return;
+            }
+
+            if (guestLoginParams.guestId.Length < 1) {
                 StringBuilder sb = new StringBuilder("guest://");
                 System.Random rnd = new System.Random();
-                guestID = rnd.Next(100000, 1000000).ToString();
+                string guestID = rnd.Next(100000, 1000000).ToString();
 
                 sb.Append(guestID);
                 sb.Append("/");
-                sb.Append(DateTime.UtcNow.ToString());
+                sb.Append(DateTime.UtcNow.ToString(CultureInfo.InvariantCulture));
 
                 guestCustomID = sb.ToString();
 
                 PlayerPrefs.SetString("GUEST_ID", guestCustomID);
-            } else guestCustomID = PlayerPrefs.GetString("GUEST_ID");
+            } else guestCustomID = guestLoginParams.guestId;
 
             var request = new LoginWithCustomIDRequest {
                 CustomId = guestCustomID,

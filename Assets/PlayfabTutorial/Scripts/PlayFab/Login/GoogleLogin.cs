@@ -6,7 +6,7 @@ using UnityEngine;
 namespace FMGames.Playfab.Login {
     public class GoogleLogin : ILogin {
         public void Login(GetPlayerCombinedInfoRequestParams loginInfoParams, Action<LoginResult> loginSuccess,
-            Action<PlayFabError> loginFailure) {
+            Action<PlayFabError> loginFailure, object loginParams) {
 #if UNITY_ANDROID
             // The following grants profile access to the Google Play Games SDK.
             // Note: If you also want to capture the player's Google email, be sure to add
